@@ -2,7 +2,9 @@ const express = require('express');
 const { ANIME } = require('@consumet/extensions');
 
 const app = express();
-const port = 3000;
+
+// Use the PORT environment variable or default to 3000
+const port = process.env.PORT || 3000;
 
 // Gogoanime provider
 const gogoanime = new ANIME.Gogoanime();
@@ -50,15 +52,4 @@ app.get('/anime-details', async (req, res) => {
 // Start the server
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
-});
-
-// Route for fetching popular anime
-app.get('/popular', async (req, res) => {
-    try {
-        const data = await gogoanime.fetchPopular();
-        res.json(data);
-    } catch (error) {
-        console.error('Error fetching popular anime:', error.message);
-        res.status(500).json({ error: 'Error fetching popular anime' });
-    }
 });
