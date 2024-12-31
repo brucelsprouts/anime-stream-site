@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anime Stream Site</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        #result { margin-top: 20px; }
+        .anime-card { margin-bottom: 20px; }
+        .anime-card img { width: 100px; }
+    </style>
+</head>
+<body>
+    <h1>Anime Stream Site - Search Anime</h1>
+    <input type="text" id="search-query" placeholder="Search for anime..." />
+    <button id="search-button">Search</button>
+
+    <div id="result"></div>
+
+    <script>
+        document.getElementById('search-button').addEventListener('click', async () => {
+            const query = document.getElementById('search-query').value;
+            const response = await fetch(`/search?query=${query}`);
+            const data = await response.json();
+            
+            const resultContainer = document.getElementById('result');
+            resultContainer.innerHTML = '';  // Clear any previous results
+
+            if (data.error) {
+                resultContainer.innerHTML = `<p>Error: ${data.error}</p>`;
+                return;
+            }
+
+            data.forEach(anime => {
+                const animeCard = document.createElement('div');
+                animeCard.classList.add('anime-card');
+                animeCard.innerHTML = `
+                    <img src="${anime.image}" alt="${anime.title}" />
+                    <h3>${anime.title}</h3>
+                    <p>Release Date: ${anime.releaseDate}</p>
+                    <p>Type: ${anime.subOrDub}</p>
+                    <a href="${anime.url}" target="_blank">More Info</a>
+                `;
+                resultContainer.appendChild(animeCard);
+            });
+        });
+    </script>
+</body>
+</html>
