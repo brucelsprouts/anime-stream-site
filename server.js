@@ -1,29 +1,64 @@
 const express = require('express');
-const { ANIME } = require('@consumet/extensions'); // Correct import for ANIME
+const { ANIME } = require('@consumet/extensions');
 
 const app = express();
 const port = 3000;
 
-// Initialize the Gogoanime provider
+// Gogoanime provider
 const gogoanime = new ANIME.Gogoanime();
 
-// Serve static files (ensure the "public" folder exists and contains your front-end files)
+// Serve static files
 app.use(express.static('public'));
 
-// Route for searching anime
+// Fetch popular anime
+app.get('/popular', async (req, res) => {
+    try {
+        const data = await gogoanime.fetchTopAiring(); // Popular anime
+        res.json(data.results);
+    } catch (error) {
+        console.error('Error fetching popular anime:', error.message);
+        res.status(500).json({ error: 'Failed to fetch popular anime' });
+    }
+});
+
+// Search anime
 app.get('/search', async (req, res) => {
-    const query = req.query.query || 'One Piece'; // Default search term if none is provided
+    const query = req.query.query || '';
+    try {
+        const data = await gogoanime.search(query);
+        res.json(data.results);
+    } catch (error) {
+        console.error('Error fetching search results:', error.message);
+        res.status(500).json({ error: 'Failed to fetch search results' });
+    }
+});
+
+// Fetch anime details (episodes)
+app.get('/anime-details', async (req, res) => {
+    const id = req.query.id;
+    if (!id) return res.status(400).json({ error: 'Anime ID is required' });
 
     try {
-        const data = await gogoanime.search(query); // Search for anime
-        res.json(data.results); // Return search results to the client
+        const data = await gogoanime.fetchAnimeInfo(id);
+        res.json(data);
     } catch (error) {
-        console.error('Error fetching data:', error.message); // Log the error
-        res.status(500).json({ error: 'Error fetching data from Gogoanime API', details: error.message });
+        console.error('Error fetching anime details:', error.message);
+        res.status(500).json({ error: 'Failed to fetch anime details' });
     }
 });
 
 // Start the server
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
+});
+
+// Route for fetching popular anime
+app.get('/popular', async (req, res) => {
+    try {
+        const data = await gogoanime.fetchPopular();
+        res.json(data);
+    } catch (error) {
+        console.error('Error fetching popular anime:', error.message);
+        res.status(500).json({ error: 'Error fetching popular anime' });
+    }
 });
