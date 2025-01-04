@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Watch Episode - Anime Stream</title>
     <link rel="stylesheet" href="css/style.css">
-
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 </head>
 <body>
@@ -17,6 +16,13 @@
             <video id="video-player" controls>
                 Your browser does not support the video tag.
             </video>
+            <!-- Add the quality selection dropdown -->
+            <div id="quality-selector">
+                <label for="quality">Select Quality: </label>
+                <select id="quality" name="quality">
+                    <!-- Quality options will be populated dynamically -->
+                </select>
+            </div>
             <div id="error-message"></div>
         </div>
         <div id="episode-list">

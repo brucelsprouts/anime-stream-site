@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const videoPlayer = document.getElementById('video-player');
     const episodeListContainer = document.querySelector('#episode-list ul');
     const errorMessage = document.getElementById('error-message');
+    const qualitySelector = document.getElementById('quality');
 
     if (!animeId || !episodeId) {
         errorMessage.textContent = 'Invalid URL. Anime or episode ID is missing.';
@@ -19,34 +20,51 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.log(episodeData); // Check the data
 
         if (episodeData.sources && episodeData.sources.length > 0) {
-            // Check if HLS sources are available (m3u8)
-            const hlsSource = episodeData.sources.find(source => source.isM3U8);
-            if (hlsSource) {
-                // Use HLS.js to play .m3u8 stream
-                if (Hls.isSupported()) {
-                    const hls = new Hls();
-                    hls.loadSource(hlsSource.url);
-                    hls.attachMedia(videoPlayer);
-                    hls.on(Hls.Events.MANIFEST_PARSED, function() {
-                        videoPlayer.play(); // Auto-play the video once the manifest is loaded
-                    });
-                } else if (videoPlayer.canPlayType('application/vnd.apple.mpegurl')) {
-                    // For Safari, which has native support for m3u8
-                    videoPlayer.src = hlsSource.url;
-                    videoPlayer.addEventListener('loadedmetadata', () => {
-                        videoPlayer.play();
-                    });
-                } else {
-                    errorMessage.textContent = 'Your browser does not support HLS streaming.';
+            // Populate the quality dropdown
+            episodeData.sources.forEach(source => {
+                if (source.isM3U8) {
+                    const option = document.createElement('option');
+                    option.value = source.url;
+                    option.textContent = `${source.quality}`;
+                    qualitySelector.appendChild(option);
                 }
-            } else {
-                errorMessage.textContent = 'No valid video source found.';
+            });
+
+            // Set up HLS.js to load video based on the selected quality
+            if (Hls.isSupported()) {
+                const hls = new Hls();
+                
+                // Initial load (default quality)
+                hls.loadSource(episodeData.sources[0].url); // Load the first available source
+                hls.attachMedia(videoPlayer);
+                hls.on(Hls.Events.MANIFEST_PARSED, function() {
+                    videoPlayer.play(); // Auto-play the video once the manifest is loaded
+                });
+
+                // Listen for quality change (when the user selects a new option)
+                qualitySelector.addEventListener('change', (event) => {
+                    const selectedUrl = event.target.value;
+                    hls.loadSource(selectedUrl);
+                    hls.attachMedia(videoPlayer);
+                    videoPlayer.play();
+                });
+            } else if (videoPlayer.canPlayType('application/vnd.apple.mpegurl')) {
+                // For Safari, which has native support for m3u8
+                videoPlayer.src = episodeData.sources[0].url; // Load the first available source
+                videoPlayer.addEventListener('loadedmetadata', () => {
+                    videoPlayer.play();
+                });
+
+                // Listen for quality change (when the user selects a new option)
+                qualitySelector.addEventListener('change', (event) => {
+                    videoPlayer.src = event.target.value;
+                    videoPlayer.play();
+                });
             }
         } else {
             errorMessage.textContent = 'No video sources available.';
         }
     } catch (error) {
-        console.error('Error loading episode sources:', error);
         errorMessage.textContent = 'Error loading video: ' + error.message;
     }
 
@@ -63,7 +81,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             `)
             .join('');
     } catch (error) {
-        console.error('Error loading anime details:', error);
         errorMessage.textContent = 'Error loading episode list.';
     }
 });
