@@ -56,12 +56,14 @@ app.get('/episode-sources', async (req, res) => {
 
     try {
         const data = await gogoanime.fetchEpisodeSources(episodeId);
+        console.log(data); // Debugging: Log the episode sources
         res.json(data);
     } catch (error) {
         console.error('Error fetching episode sources:', error.message);
         res.status(500).json({ error: 'Failed to fetch episode sources' });
     }
 });
+
 
 // Start the server
 app.listen(port, () => {
