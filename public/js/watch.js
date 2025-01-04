@@ -29,7 +29,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             errorMessage.textContent = 'No video sources available.';
         }
     } catch (error) {
-        console.error('Error loading video:', error);
         errorMessage.textContent = 'Error loading video.';
     }
 
@@ -46,7 +45,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             `)
             .join('');
     } catch (error) {
-        console.error('Error loading episode list:', error);
         errorMessage.textContent = 'Error loading episode list.';
     }
 });
