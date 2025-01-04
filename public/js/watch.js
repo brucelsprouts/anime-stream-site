@@ -3,7 +3,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const animeId = params.get('id');
     const episodeId = params.get('episode');
     const videoPlayer = document.getElementById('video-player');
-    const videoSource = document.getElementById('video-source');
     const episodeListContainer = document.querySelector('#episode-list ul');
     const errorMessage = document.getElementById('error-message');
 
@@ -17,39 +16,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         const episodeResponse = await fetch(`/episode-sources?episodeId=${episodeId}`);
         const episodeData = await episodeResponse.json();
 
-        console.log('Episode Data:', episodeData); // Debugging
-
         if (episodeData.sources && episodeData.sources.length > 0) {
-            const highestQuality = episodeData.sources.find(source => source.quality === '1080p') || episodeData.sources[0];
-            console.log('Selected Source:', highestQuality); // Debugging
+            // Use the first available source (MP4)
+            const highestQuality = episodeData.sources[0];
 
-            if (Hls.isSupported()) {
-                const hls = new Hls();
-                hls.loadSource(highestQuality.url);
-                hls.attachMedia(videoPlayer);
-                hls.on(Hls.Events.MANIFEST_PARSED, () => {
-                    console.log('HLS manifest parsed, starting playback');
-                    videoPlayer.play();
-                });
-                hls.on(Hls.Events.ERROR, (event, data) => {
-                    console.error('HLS error:', data);
-                    errorMessage.textContent = `Error loading video: ${data.type} - ${data.details}`;
-                    if (data.response && data.response.code) {
-                        console.error('HTTP response code:', data.response.code);
-                    }
-                    if (data.response && data.response.text) {
-                        console.error('HTTP response text:', data.response.text);
-                    }
-                });
-            } else if (videoPlayer.canPlayType('application/vnd.apple.mpegurl')) {
-                videoPlayer.src = highestQuality.url;
-                videoPlayer.addEventListener('loadedmetadata', () => {
-                    console.log('Metadata loaded, starting playback');
-                    videoPlayer.play();
-                });
-            } else {
-                errorMessage.textContent = 'Your browser does not support HLS.';
-            }
+            // Directly set the video source (no HLS.js needed for MP4)
+            videoPlayer.src = highestQuality.url;
+            videoPlayer.addEventListener('loadedmetadata', () => {
+                videoPlayer.play();
+            });
         } else {
             errorMessage.textContent = 'No video sources available.';
         }
