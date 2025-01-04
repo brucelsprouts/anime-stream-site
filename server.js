@@ -53,3 +53,17 @@ app.get('/anime-details', async (req, res) => {
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
 });
+
+app.get('/episode-sources', async (req, res) => {
+    const episodeId = req.query.episodeId;
+    if (!episodeId) return res.status(400).json({ error: 'Episode ID is required' });
+
+    try {
+        const data = await gogoanime.fetchEpisodeSources(episodeId);
+        console.log('Fetched episode sources:', data); // Debugging
+        res.json(data);
+    } catch (error) {
+        console.error('Error fetching episode sources:', error.message);
+        res.status(500).json({ error: 'Failed to fetch episode sources' });
+    }
+});

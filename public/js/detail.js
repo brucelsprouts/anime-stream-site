@@ -24,13 +24,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             episodeListContainer.innerHTML = anime.episodes
                 .map(episode => `
                     <li>
-                        <a href="${episode.url}" target="_blank">${episode.title}</a>
+                        <a href="/watch.html?id=${animeId}&episode=${episode.id}" target="_self">Episode ${episode.number}</a>
                     </li>
                 `)
                 .join('');
         } else {
             episodeListContainer.innerHTML = '<p>No episodes available.</p>';
-        }
+        }        
     } catch (error) {
         animeInfoContainer.innerHTML = '<p>Error fetching anime details.</p>';
     }
