@@ -49,11 +49,7 @@ app.get('/anime-details', async (req, res) => {
     }
 });
 
-// Start the server
-app.listen(port, () => {
-    console.log(`Server is running on http://localhost:${port}`);
-});
-
+// Fetch episode sources
 app.get('/episode-sources', async (req, res) => {
     const episodeId = req.query.episodeId;
     if (!episodeId) return res.status(400).json({ error: 'Episode ID is required' });
@@ -66,4 +62,9 @@ app.get('/episode-sources', async (req, res) => {
         console.error('Error fetching episode sources:', error.message);
         res.status(500).json({ error: 'Failed to fetch episode sources' });
     }
+});
+
+// Start the server
+app.listen(port, () => {
+    console.log(`Server is running on http://localhost:${port}`);
 });

@@ -17,15 +17,44 @@ document.addEventListener('DOMContentLoaded', async () => {
         const episodeResponse = await fetch(`/episode-sources?episodeId=${episodeId}`);
         const episodeData = await episodeResponse.json();
 
+        console.log('Episode Data:', episodeData); // Debugging
+
         if (episodeData.sources && episodeData.sources.length > 0) {
             const highestQuality = episodeData.sources.find(source => source.quality === '1080p') || episodeData.sources[0];
-            videoSource.src = highestQuality.url;
-            videoPlayer.load();
-            videoPlayer.play();
+            console.log('Selected Source:', highestQuality); // Debugging
+
+            if (Hls.isSupported()) {
+                const hls = new Hls();
+                hls.loadSource(highestQuality.url);
+                hls.attachMedia(videoPlayer);
+                hls.on(Hls.Events.MANIFEST_PARSED, () => {
+                    console.log('HLS manifest parsed, starting playback');
+                    videoPlayer.play();
+                });
+                hls.on(Hls.Events.ERROR, (event, data) => {
+                    console.error('HLS error:', data);
+                    errorMessage.textContent = `Error loading video: ${data.type} - ${data.details}`;
+                    if (data.response && data.response.code) {
+                        console.error('HTTP response code:', data.response.code);
+                    }
+                    if (data.response && data.response.text) {
+                        console.error('HTTP response text:', data.response.text);
+                    }
+                });
+            } else if (videoPlayer.canPlayType('application/vnd.apple.mpegurl')) {
+                videoPlayer.src = highestQuality.url;
+                videoPlayer.addEventListener('loadedmetadata', () => {
+                    console.log('Metadata loaded, starting playback');
+                    videoPlayer.play();
+                });
+            } else {
+                errorMessage.textContent = 'Your browser does not support HLS.';
+            }
         } else {
             errorMessage.textContent = 'No video sources available.';
         }
     } catch (error) {
+        console.error('Error loading video:', error);
         errorMessage.textContent = 'Error loading video.';
     }
 
@@ -42,6 +71,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             `)
             .join('');
     } catch (error) {
+        console.error('Error loading episode list:', error);
         errorMessage.textContent = 'Error loading episode list.';
     }
 });
