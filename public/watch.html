@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Watch Episode - Anime Stream</title>
     <link rel="stylesheet" href="css/style.css">
+    <!-- Video.js CSS -->
+    <link href="https://vjs.zencdn.net/7.2.3/video-js.css" rel="stylesheet">
 </head>
 <body>
     <nav>
@@ -12,7 +14,8 @@
     </nav>
     <main>
         <div id="watch-section">
-            <video id="video-player" controls>
+            <!-- Video.js Player -->
+            <video id="video-player" class="video-js vjs-default-skin" controls>
                 Your browser does not support the video tag.
             </video>
             <!-- Add the quality selection dropdown -->
@@ -29,7 +32,9 @@
             <ul></ul>
         </div>
     </main>
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <!-- Video.js and HLS.js (contrib-hls) JavaScript -->
+    <script src="https://vjs.zencdn.net/7.2.3/video.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/videojs-contrib-hls/5.14.1/videojs-contrib-hls.js"></script>
     <script src="js/watch.js"></script>    
 </body>
 </html>
