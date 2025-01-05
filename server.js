@@ -1,4 +1,5 @@
 const express = require('express');
+const request = require('request'); // Import the 'request' package
 const { ANIME } = require('@consumet/extensions');
 
 const app = express();
@@ -11,6 +12,22 @@ const gogoanime = new ANIME.Gogoanime();
 
 // Serve static files
 app.use(express.static('public'));
+
+// Proxy route for m3u8 files
+app.get('/proxy', (req, res) => {
+    const url = req.query.url; // URL of the .m3u8 file to be proxied
+    if (!url) {
+        return res.status(400).json({ error: 'URL parameter is required' });
+    }
+
+    // Fetch the m3u8 file from the external source and pipe it through
+    request(url)
+        .on('error', (error) => {
+            console.error('Error fetching the URL:', error);
+            res.status(500).json({ error: 'Failed to fetch the m3u8 file' });
+        })
+        .pipe(res);
+});
 
 // Fetch popular anime
 app.get('/popular', async (req, res) => {
@@ -62,7 +79,6 @@ app.get('/episode-sources', async (req, res) => {
         res.status(500).json({ error: 'Failed to fetch episode sources' });
     }
 });
-
 
 // Start the server
 app.listen(port, () => {

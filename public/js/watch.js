@@ -24,17 +24,19 @@ document.addEventListener('DOMContentLoaded', async () => {
             episodeData.sources.forEach(source => {
                 if (source.isM3U8) {
                     const option = document.createElement('option');
-                    option.value = source.url;
-                    option.textContent = `${source.quality}`;
+                    option.value = source.url; // Set the value to the URL of the .m3u8 file
+                    option.textContent = `${source.quality}`; // Show quality in dropdown
                     qualitySelector.appendChild(option);
                 }
             });
 
-            // Initialize Video.js player
+            // Initialize Video.js player with the proxy URL
+            const selectedUrl = episodeData.sources[0].url; // Default to first URL
+            const proxyUrl = `http://localhost:3000/proxy?url=${encodeURIComponent(selectedUrl)}`;
             const player = videojs(videoPlayer, {
-                techOrder: ['html5'],  // Make sure we are using HTML5 player
+                techOrder: ['html5'],
                 sources: [{
-                    src: episodeData.sources[0].url,
+                    src: proxyUrl, // Use the proxy URL
                     type: 'application/x-mpegURL'
                 }],
                 autoplay: true,
@@ -45,7 +47,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             // Listen for quality change (when the user selects a new option)
             qualitySelector.addEventListener('change', (event) => {
                 const selectedUrl = event.target.value;
-                player.src({ type: 'application/x-mpegURL', src: selectedUrl });
+                const proxyUrl = `http://localhost:3000/proxy?url=${encodeURIComponent(selectedUrl)}`;
+                player.src({ type: 'application/x-mpegURL', src: proxyUrl });
                 player.play();
             });
 
