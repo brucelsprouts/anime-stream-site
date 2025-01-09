@@ -1,28 +1,14 @@
 {
-  "name": "anime-stream-site",
-  "version": "1.0.0",
-  "main": "script.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js",
-    "dev": "vite",
-    "build": "vite build"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
-  "devDependencies": {
-    "vite": "^6.0.6"
-  },
-  "dependencies": {
-    "@consumet/extensions": "^1.8.1",
-    "axios": "^1.7.9",
-    "cors": "^2.8.5",
-    "cors-anywhere": "^0.4.4",
-    "express": "^4.21.2",
-    "http-proxy-middleware": "^3.0.3",
-    "punycode": "^2.3.1",
-    "request": "^2.88.2"
-  }
+    "name": "anime-stream-site",
+    "version": "1.0.0",
+    "description": "Your anime streaming site",
+    "main": "index.js",
+    "scripts": {
+        "start": "node app.js"
+    },
+    "dependencies": {
+        "@consumet/extensions": "^1.8.1",
+        "express": "^4.21.2",
+        "request": "^2.88.2"
+    }
 }
