@@ -2,10 +2,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     const params = new URLSearchParams(window.location.search);
     const animeId = params.get('id');
     const episodeId = params.get('episode');
-    const videoPlayer = document.getElementById('video-player');
     const episodeListContainer = document.querySelector('#episode-list ul');
     const errorMessage = document.getElementById('error-message');
     const qualitySelector = document.getElementById('quality');
+    const videoPlayer = document.getElementById('video-player');
 
     if (!animeId || !episodeId) {
         errorMessage.textContent = 'Invalid URL. Anime or episode ID is missing.';
@@ -13,45 +13,46 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     try {
-        // Fetch episode sources using zoro API
-        const episodeData = await zoro.fetchEpisodeSources(episodeId);
-        console.log(episodeData); // Debugging: Log the episode data
+        // Fetch episode sources
+        const episodeSourcesResponse = await fetch(`/episode-sources?episodeId=${episodeId}`);
+        const episodeSources = await episodeSourcesResponse.json();
 
-        if (episodeData.sources && episodeData.sources.length > 0) {
-            // Populate the quality dropdown
-            episodeData.sources.forEach(source => {
-                if (source.isM3U8) {
-                    const option = document.createElement('option');
-                    option.value = source.url;
-                    option.textContent = source.quality;
-                    qualitySelector.appendChild(option);
-                }
-            });
-
-            // Default to the first available source
-            const selectedUrl = episodeData.sources[0].url;
-            const proxyUrl = `http://localhost:3000/proxy?url=${encodeURIComponent(selectedUrl)}`;
-
-            // Initialize Video.js player
-            const player = videojs(videoPlayer, {
-                techOrder: ['html5'],
-                sources: [{ src: proxyUrl, type: 'application/x-mpegURL' }],
-                autoplay: true,
-                controls: true,
-                preload: 'auto'
-            });
-
-            // Handle quality change
-            qualitySelector.addEventListener('change', (event) => {
-                const newUrl = event.target.value;
-                const proxyNewUrl = `http://localhost:3000/proxy?url=${encodeURIComponent(newUrl)}`;
-                player.src({ type: 'application/x-mpegURL', src: proxyNewUrl });
-                player.play();
-            });
-
-        } else {
-            errorMessage.textContent = 'No video sources available.';
+        if (episodeSources.error) {
+            throw new Error(episodeSources.error);
         }
+
+        // Populate quality selector dynamically
+        episodeSources.sources.forEach(source => {
+            const option = document.createElement('option');
+            option.value = source.url;
+            option.textContent = `${source.quality} - ${source.isM3U8 ? 'HLS' : 'MP4'}`;
+            qualitySelector.appendChild(option);
+        });
+
+        // Initialize Video.js player
+        const player = videojs(videoPlayer, {
+            controls: true,
+            autoplay: true,
+            preload: 'auto',
+            techOrder: ['html5', 'flash'],
+        });
+
+        // Set default video source (HLS or MP4 based on the first source)
+        if (episodeSources.sources.length > 0) {
+            const defaultSource = episodeSources.sources[0];
+            player.src({
+                type: defaultSource.isM3U8 ? 'application/x-mpegURL' : 'video/mp4',
+                src: defaultSource.url
+            });
+        }
+
+        // Listen for quality selection change
+        qualitySelector.addEventListener('change', (event) => {
+            const selectedSource = event.target.value;
+            player.src({ type: 'application/x-mpegURL', src: selectedSource });
+            player.play();
+        });
+
     } catch (error) {
         errorMessage.textContent = 'Error fetching episode sources: ' + error.message;
     }

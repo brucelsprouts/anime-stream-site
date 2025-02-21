@@ -6,7 +6,11 @@
     <title>Watch Episode - Anime Stream</title>
     <link rel="stylesheet" href="css/style.css">
     <!-- Video.js CSS -->
-    <link href="https://vjs.zencdn.net/7.2.3/video-js.css" rel="stylesheet">
+    <link href="https://vjs.zencdn.net/7.11.4/video-js.css" rel="stylesheet">
+
+    <!-- Video.js and HLS.js (built-in support in Video.js 7.x) -->
+    <script src="https://vjs.zencdn.net/7.11.4/video.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/videojs-http-streaming@2.11.0/dist/videojs-http-streaming.min.js"></script>
 </head>
 <body>
     <nav>
@@ -14,17 +18,17 @@
     </nav>
     <main>
         <div id="watch-section">
-            <!-- Video.js Player -->
             <video id="video-player" class="video-js vjs-default-skin" controls>
                 Your browser does not support the video tag.
             </video>
-            <!-- Add the quality selection dropdown -->
-            <div id="quality-selector">
-                <label for="quality">Select Quality: </label>
-                <select id="quality" name="quality">
-                    <!-- Quality options will be populated dynamically -->
+            
+            <div id="episode-selector">
+                <label for="episode">Select Episode: </label>
+                <select id="episode" name="episode">
+                    <!-- Episode options will be populated dynamically -->
                 </select>
             </div>
+            
             <div id="error-message"></div>
         </div>
         <div id="episode-list">
@@ -32,9 +36,7 @@
             <ul></ul>
         </div>
     </main>
-    <!-- Video.js and HLS.js (contrib-hls) JavaScript -->
-    <script src="https://vjs.zencdn.net/7.2.3/video.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/videojs-contrib-hls/5.14.1/videojs-contrib-hls.js"></script>
+    <!-- Removed redundant video.js and contrib-hls.js scripts -->
     <script src="js/watch.js"></script>    
 </body>
 </html>

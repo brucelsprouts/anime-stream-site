@@ -76,8 +76,8 @@ app.get('/episode-sources', async (req, res) => {
     if (!episodeId) return res.status(400).json({ error: 'Episode ID is required' });
 
     try {
-        const data = await zoro.fetchEpisodeSources(episodeId); // Using Zoro for episode sources
-        res.json(data);
+        const data = await zoro.fetchEpisodeSources(episodeId); // Fetch episode sources using Zoro API
+        res.json(data); // Return the data in JSON format
     } catch (error) {
         console.error('Error fetching episode sources:', error.message);
         res.status(500).json({ error: 'Failed to fetch episode sources' });
