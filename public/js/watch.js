@@ -12,43 +12,40 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
-    // Fetch episode sources
     try {
-        const episodeResponse = await fetch(`/episode-sources?episodeId=${episodeId}`);
-        const episodeData = await episodeResponse.json();
-
-        console.log(episodeData); // Check the data
+        // Fetch episode sources using zoro API
+        const episodeData = await zoro.fetchEpisodeSources(episodeId);
+        console.log(episodeData); // Debugging: Log the episode data
 
         if (episodeData.sources && episodeData.sources.length > 0) {
             // Populate the quality dropdown
             episodeData.sources.forEach(source => {
                 if (source.isM3U8) {
                     const option = document.createElement('option');
-                    option.value = source.url; // Set the value to the URL of the .m3u8 file
-                    option.textContent = `${source.quality}`; // Show quality in dropdown
+                    option.value = source.url;
+                    option.textContent = source.quality;
                     qualitySelector.appendChild(option);
                 }
             });
 
-            // Initialize Video.js player with the proxy URL
-            const selectedUrl = episodeData.sources[0].url; // Default to first URL
+            // Default to the first available source
+            const selectedUrl = episodeData.sources[0].url;
             const proxyUrl = `http://localhost:3000/proxy?url=${encodeURIComponent(selectedUrl)}`;
+
+            // Initialize Video.js player
             const player = videojs(videoPlayer, {
                 techOrder: ['html5'],
-                sources: [{
-                    src: proxyUrl, // Use the proxy URL
-                    type: 'application/x-mpegURL'
-                }],
+                sources: [{ src: proxyUrl, type: 'application/x-mpegURL' }],
                 autoplay: true,
                 controls: true,
                 preload: 'auto'
             });
 
-            // Listen for quality change (when the user selects a new option)
+            // Handle quality change
             qualitySelector.addEventListener('change', (event) => {
-                const selectedUrl = event.target.value;
-                const proxyUrl = `http://localhost:3000/proxy?url=${encodeURIComponent(selectedUrl)}`;
-                player.src({ type: 'application/x-mpegURL', src: proxyUrl });
+                const newUrl = event.target.value;
+                const proxyNewUrl = `http://localhost:3000/proxy?url=${encodeURIComponent(newUrl)}`;
+                player.src({ type: 'application/x-mpegURL', src: proxyNewUrl });
                 player.play();
             });
 
@@ -56,7 +53,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             errorMessage.textContent = 'No video sources available.';
         }
     } catch (error) {
-        errorMessage.textContent = 'Error loading video: ' + error.message;
+        errorMessage.textContent = 'Error fetching episode sources: ' + error.message;
     }
 
     // Fetch anime details for episode list
@@ -72,6 +69,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             `)
             .join('');
     } catch (error) {
-        errorMessage.textContent = 'Error loading episode list.';
+        errorMessage.textContent = 'Error loading episode list: ' + error.message;
     }
 });

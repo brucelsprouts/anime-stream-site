@@ -1,12 +1,12 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    const popularAnimeContainer = document.getElementById('popular-anime');
+    const topAiringAnimeContainer = document.getElementById('top-airing-anime');
     
-    // Fetch and display popular anime
-    const fetchPopularAnime = async () => {
+    // Fetch and display top airing anime
+    const fetchTopAiringAnime = async () => {
         try {
-            const response = await fetch('/popular');
-            const popularAnime = await response.json();
-            popularAnimeContainer.innerHTML = popularAnime
+            const response = await fetch('/top-airing');
+            const topAiringAnime = await response.json();
+            topAiringAnimeContainer.innerHTML = topAiringAnime
                 .map(anime => `
                     <div class="anime-card">
                         <img src="${anime.image}" alt="${anime.title}">
@@ -16,12 +16,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                 `)
                 .join('');
         } catch (error) {
-            popularAnimeContainer.innerHTML = '<p>Failed to load popular anime.</p>';
+            topAiringAnimeContainer.innerHTML = '<p>Failed to load top airing anime.</p>';
         }
     };
 
-    fetchPopularAnime();
-
+    fetchTopAiringAnime();
+    
     // Search functionality
     const searchButton = document.getElementById('search-button');
     searchButton.addEventListener('click', () => {

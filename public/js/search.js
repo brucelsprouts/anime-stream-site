@@ -41,5 +41,5 @@ function viewAnime(id) {
 // Redirect to search
 document.getElementById('search-button').addEventListener('click', () => {
     const query = document.getElementById('search-query').value;
-    window.location.href = `/pubic/search-results.html?query=${encodeURIComponent(query)}`;
+    window.location.href = `/search-results.html?query=${encodeURIComponent(query)}`;
 });
